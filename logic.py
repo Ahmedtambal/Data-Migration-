@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import openai
 import os
+from openai import OpenAI
 
 # Initialize OpenAI client correctly for OpenAI v1.12.0
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
