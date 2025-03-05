@@ -38,12 +38,10 @@ Do not include any extra explanation; output only valid JSON.
 """
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4o",  # Use the correct model identifier if needed
-            messages=[
-                {"role": "system", "content": "You are a helpful data mapping assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.0  # Lower temperature for deterministic output
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+       
+            temperature=0  # Lower temperature for deterministic output
         )
         mapping_json = response.choices[0].message.content.strip()  # Use dot notation
         print("Raw GPT response:", mapping_json)  # Debug print
