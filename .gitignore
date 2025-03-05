@@ -1,0 +1,19 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info
+*.egg
+
+# Ignore virtual environment folders
+venv/
+env/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore the .streamlit folder (contains secrets, config, etc.)
+.streamlit/
