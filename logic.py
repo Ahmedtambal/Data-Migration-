@@ -3,12 +3,11 @@ import pandas as pd
 import streamlit as st
 import openai
 import os
-from openai import OpenAI
 
-# Initialize OpenAI client correctly for OpenAI v1.12.0
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
-if not client.api_key:
-    raise ValueError("OpenAI API key not found!")
+# Set the API key directly on the openai module.
+openai.api_key = os.getenv("OPENAI_API_KEY", "")
+if not openai.api_key:
+    raise ValueError("OpenAI API key not found in environment variables or Streamlit secrets")
 
 # Function to read an Excel file into a DataFrame
 def read_excel_file(uploaded_file):
@@ -38,25 +37,23 @@ Please provide a JSON object that maps each column from the leads import file to
 Do not include any extra explanation; output only valid JSON.
 """
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",  # Use the correct model
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",  # Use the correct model identifier if needed
             messages=[
                 {"role": "system", "content": "You are a helpful data mapping assistant."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.0  # Lower temperature for deterministic output
         )
-        mapping_json = response.choices[0].message.content.strip()
-
-        # Debugging Output
-        print("Raw GPT response:", mapping_json)
+        mapping_json = response.choices[0].message.content.strip()  # Use dot notation
+        print("Raw GPT response:", mapping_json)  # Debug print
 
         # Strip out markdown code fences if present
         if mapping_json.startswith("```json"):
             mapping_json = mapping_json[len("```json"):].strip()
         if mapping_json.endswith("```"):
             mapping_json = mapping_json[:-3].strip()
-
+        
         if not mapping_json:
             raise ValueError("Received an empty response from the GPT API.")
         
@@ -79,7 +76,6 @@ def update_leads_import(master_file, leads_import_file, client_first_name="", cl
     if client_first_name and client_surname:
         master_first_name_col = mapping.get("First Name")
         master_surname_col = mapping.get("Surname")
-        
         if not master_first_name_col or not master_surname_col:
             raise ValueError("Mapping for 'First Name' or 'Surname' not found in the master file.")
         
@@ -94,7 +90,6 @@ def update_leads_import(master_file, leads_import_file, client_first_name="", cl
         print("DEBUG: User input for first name:", repr(user_first))
         print("DEBUG: User input for surname:", repr(user_surname))
 
-        # Apply filter
         filtered_master_df = master_df[
             (df_first_names == user_first) & (df_surnames == user_surname)
         ]
