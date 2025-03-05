@@ -9,16 +9,13 @@ from openai import OpenAI
 import json
 
 
-# At the top of your file with other imports
-# Initialize client once at the module level
-try:
-    import streamlit as st
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-except (AttributeError, ModuleNotFoundError):
-    import os
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
-    if not client.api_key:
-        raise ValueError("OpenAI API key not found in environment variables or Streamlit secrets")
+import openai
+import os
+
+openai.api_key = os.getenv("OPENAI_API_KEY", "")
+if not openai.api_key:
+    raise ValueError("OpenAI API key not found!")
+
 
 
 
@@ -48,12 +45,9 @@ Please provide a JSON object that maps each column from the leads import file to
 Do not include any extra explanation; output only valid JSON.
 """
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",  # Replace with your actual model identifier if needed
-            messages=[
-                {"role": "system", "content": "You are a helpful data mapping assistant."},
-                {"role": "user", "content": prompt}
-            ],
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
             temperature=0.0  # Lower temperature for deterministic output
         )
         mapping_json = response.choices[0].message.content.strip()  # Use dot notation here
